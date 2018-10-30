@@ -1,0 +1,26 @@
+version: '2'
+services:
+    database:
+        image: mongo:4.1
+        container_name: mongo4
+        network_mode: "host"
+        volumes:
+            - "./data/mongo/data:/data/db"
+    frontend:
+        image: ithelp/frontend:1.0.0
+        container_name: ithelp.frontend
+        network_mode: "host"
+        volumes:
+            - "./data/nginx/log:/var/log/nginx"
+    backend:
+        image: ithelp/backend:1.0.0
+        container_name: ithelp.backend
+        network_mode: "host"
+        command: >
+            /bin/bash -c "
+            sleep 15;
+            npm run start;"
+        environment:
+            PORT: 3001
+            NODE_ENV: "development"
+            MONGODB_URL: "mongodb://127.0.0.1:27017"
