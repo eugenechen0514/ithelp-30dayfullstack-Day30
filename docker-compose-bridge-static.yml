@@ -1,0 +1,47 @@
+version: '2'
+services:
+    database:
+        image: mongo:4.1
+        container_name: mongo4
+        networks:
+            ithelp_application:
+                ipv4_address: 172.28.0.2
+        ports:
+            - "27017:27017"
+        volumes:
+            - "./data/mongo/data:/data/db"
+    frontend:
+        image: ithelp/frontend:1.0.0
+        container_name: ithelp.frontend
+        networks:
+            ithelp_application:
+                ipv4_address: 172.28.0.3
+        ports:
+            - "80:80"
+        volumes:
+            - "./data/nginx/log:/var/log/nginx"
+    backend:
+        image: ithelp/backend:1.0.0
+        container_name: ithelp.backend
+        networks:
+            ithelp_application:
+                ipv4_address: 172.28.0.4
+        ports:
+            - "3001:3001"
+        command: >
+            /bin/bash -c "
+            sleep 15;
+            npm run start;"
+        environment:
+            PORT: 3001
+            NODE_ENV: "development"
+            MONGODB_URL: "mongodb://database:27017"
+networks:
+    ithelp_application:
+        driver: bridge
+        ipam:
+            driver: default
+            config:
+                - subnet: 172.28.0.0/16
+                  gateway: 172.28.0.1
+
