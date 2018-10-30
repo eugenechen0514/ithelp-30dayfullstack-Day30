@@ -1,0 +1,29 @@
+version: '2'
+services:
+    database:
+        image: mongo:4.1
+        container_name: mongo4
+        ports:
+            - "27017:27017"
+        volumes:
+            - "./data/mongo/data:/data/db"
+    frontend:
+        image: ithelp/frontend:1.0.0
+        container_name: ithelp.frontend
+        ports:
+            - "80:80"
+        volumes:
+            - "./data/nginx/log:/var/log/nginx"
+    backend:
+        image: ithelp/backend:1.0.0
+        container_name: ithelp.backend
+        ports:
+            - "3001:3001"
+        command: >
+            /bin/bash -c "
+            sleep 15;
+            npm run start;"
+        environment:
+            PORT: 3001
+            NODE_ENV: "development"
+            MONGODB_URL: "mongodb://database:27017"
